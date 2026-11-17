@@ -8,19 +8,19 @@
 
 **目录**
 
-- [一、选站标准](#一选站标准)
-- [二、风险提醒](#二风险提醒)
-- [三、如何自己检测一个中转站](#三如何自己检测一个中转站)
-- [四、分站数据（来自 Folkbench）](#四分站数据来自-folkbench)
-- [五、需谨慎](#五需谨慎)
+- [一、中转站选站标准](#一中转站选站标准)
+- [二、中转站充值风险提醒](#二中转站充值风险提醒)
+- [三、如何自己检测一个中转站（降智 / 掺假）](#三如何自己检测一个中转站降智--掺假)
+- [四、中转站推荐列表与分站数据（来自 Folkbench）](#四中转站推荐列表与分站数据来自-folkbench)
+- [五、需谨慎的中转站](#五需谨慎的中转站)
 - [六、Folkbench Switch 桌面端](#六folkbench-switch-桌面端)
-- [七、FAQ](#七faq)
-- [八、申请收录 / 踩坑报告](#八申请收录--踩坑报告)
+- [七、中转站常见问题 FAQ](#七中转站常见问题-faq)
+- [八、中转站申请收录 / 踩坑报告](#八中转站申请收录--踩坑报告)
 - [更新日志](#更新日志)
 
 ---
 
-## 一、选站标准
+## 一、中转站选站标准
 
 挑 API 中转站，按下面五项逐条过一遍，任何一项答不上来，就先别加钱。
 
@@ -39,7 +39,7 @@
 - **主用 + 备用。** 长期业务至少准备两家，配置好随时可切换。
 - **看主体和联系方式。** 有无企业主体、能否开票、客服响应时间，决定了出问题时有没有人可找。
 
-## 二、风险提醒
+## 二、中转站充值风险提醒
 
 > [!WARNING]
 > **不要大额充值。** 中转站行业门槛低、生命周期短，跑路、降智、限流、改价都很常见。按「一周用量」充值，用完再充。
@@ -50,7 +50,7 @@
 - **不要把 Key 贴到群里或 issue 里。** 报告问题时请打码。
 - **「可用率 99%」看窗口和样本量。** 参考：[别再被 99% 可用率骗了：稳定性测试指南](https://folkbench.com/blog/ai-api-relay-stability-guide?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)。
 
-## 三、如何自己检测一个中转站
+## 三、如何自己检测一个中转站（降智 / 掺假）
 
 不想完全依赖任何榜单，可以自己按下面顺序测一遍：
 
@@ -73,7 +73,7 @@
 | [Claude 中转站测评](https://folkbench.com/claude-zhongzhuanzhan-ceping?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) · [GPT / Codex 中转站测评](https://folkbench.com/gpt-codex-zhongzhuanzhan-ceping?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 按模型看价格与可用率 |
 | [可用率榜](https://folkbench.com/rankings?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) · [稳定性榜](https://folkbench.com/rankings/stability?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) · [会话成本榜](https://folkbench.com/rankings/cost?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) · [数据安全榜](https://folkbench.com/rankings/data-security?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 各类榜单 |
 
-## 四、分站数据（来自 Folkbench）
+## 四、中转站推荐列表与分站数据（来自 Folkbench）
 
 数据来源：[Folkbench 中转站列表](https://folkbench.com/stations?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)，抓取于 **2026-11-17（北京时间）**。可用率与延迟为近 24 小时窗口，页面每 15 分钟更新，下表只是当天的快照，最新数据请点进各站详情页。
 
@@ -260,7 +260,7 @@
 - 列表页数据：覆盖模型 21，近 24 小时暂无成功请求记录，API 倍率 0.20×，数据安全 0 级
 - 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：未提供；国内发票：未提供；退款：未提供
 
-## 五、需谨慎
+## 五、需谨慎的中转站
 
 截至 2026-11-17，Folkbench 没有公开「不推荐 / 需谨慎」名单，所以这里**暂不点名任何站点**。我们会按下面的标准收集线索，核实后再写进来：
 
@@ -279,7 +279,7 @@
 - 下载：<https://github.com/Folkbench/folkbench/releases>
 - 源码与反馈：<https://github.com/Folkbench/folkbench>
 
-## 七、FAQ
+## 七、中转站常见问题 FAQ
 
 **Q：哪家中转站最好？**
 没有对所有模型和场景都最好的一家。先确定模型、客户端和预算，再看对应模型的记录，最后用小额试用验证。
@@ -302,7 +302,7 @@
 **Q：发现数据错了怎么办？**
 提 issue，或走 Folkbench [纠错与申诉](https://folkbench.com/corrections?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)。
 
-## 八、申请收录 / 踩坑报告
+## 八、中转站申请收录 / 踩坑报告
 
 - 站长申请收录：[新建「申请收录」issue](../../issues/new?template=site-submission.yml)
 - 用户踩坑 / 问题反馈：[新建「问题反馈 / 踩坑报告」issue](../../issues/new?template=pitfall-report.yml)
