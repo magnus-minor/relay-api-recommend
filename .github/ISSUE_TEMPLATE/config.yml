@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Folkbench 站长入驻
+    url: https://folkbench.com/vendor-join?utm_source=github&utm_medium=issue&utm_campaign=relay-recommend
+    about: 站长也可以直接在 Folkbench 提交入驻申请
+  - name: Folkbench 纠错与申诉
+    url: https://folkbench.com/corrections?utm_source=github&utm_medium=issue&utm_campaign=relay-recommend
+    about: 对 Folkbench 页面数据有异议，请走纠错流程

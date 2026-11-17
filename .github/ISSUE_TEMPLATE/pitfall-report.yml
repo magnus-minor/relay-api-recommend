@@ -1,0 +1,53 @@
+name: 问题反馈 / 踩坑报告
+description: 反馈中转站的降智、跑路、计费异常、无法退款等问题，或指出本指南的错误
+title: "踩坑报告：<站点名称> - <问题简述>"
+labels: ["踩坑报告"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请尽量提供可核实的信息（时间、模型、分组、截图）。**截图里的 API Key、订单号、个人信息请务必打码。**
+  - type: input
+    id: site
+    attributes:
+      label: 站点名称与 URL
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: 问题类型
+      options:
+        - 疑似模型降级 / 替换
+        - 可用率差 / 频繁报错 / 流式中断
+        - 计费与日志不符
+        - 无法退款 / 无法提现
+        - 疑似跑路 / 客服失联
+        - 数据安全问题
+        - 本指南内容错误
+        - 其他
+    validations:
+      required: true
+  - type: input
+    id: when
+    attributes:
+      label: 发生时间
+      placeholder: 2026-11-17 14:00（北京时间）
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: 模型与分组
+      placeholder: claude-opus-5-5 / 分组名
+  - type: textarea
+    id: detail
+    attributes:
+      label: 详细经过与证据
+      description: 复现步骤、请求与返回（脱敏）、截图链接等
+    validations:
+      required: true
+  - type: input
+    id: amount
+    attributes:
+      label: 涉及金额（可选）

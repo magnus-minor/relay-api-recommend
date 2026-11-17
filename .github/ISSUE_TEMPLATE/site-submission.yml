@@ -1,0 +1,61 @@
+name: 申请收录
+description: 站长提交中转站，申请加入本指南与 Folkbench 收录
+title: "申请收录：<站点名称>"
+labels: ["申请收录"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢提交！请如实填写。本仓库分站数据跟随 Folkbench 页面，排序遵循 Folkbench 站点规则，包含合作等级和运营加权；部分数据为展示样例。
+        也可以直接走 Folkbench 站长入驻：https://folkbench.com/vendor-join?utm_source=github&utm_medium=issue&utm_campaign=relay-recommend
+        **请不要在 issue 里粘贴任何 API Key。**
+  - type: input
+    id: name
+    attributes:
+      label: 站点名称
+      placeholder: 例如 XX API
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 官网 URL
+      placeholder: https://
+    validations:
+      required: true
+  - type: textarea
+    id: models
+    attributes:
+      label: 支持的模型与分组
+      description: 列出主要模型 ID 和分组名，以及支持的协议（OpenAI Chat / Responses / Anthropic Messages / Gemini）
+      placeholder: |
+        - claude-opus-5-5（分组：xxx）
+        - gpt-6-1-sol（分组：xxx）
+    validations:
+      required: true
+  - type: textarea
+    id: pricing
+    attributes:
+      label: 价格与充值
+      description: 价格倍率或定价页链接、最低充值金额、注册赠送、计费币种
+    validations:
+      required: true
+  - type: textarea
+    id: service
+    attributes:
+      label: 退款、发票与支付方式
+      placeholder: 退款政策链接 / 是否可开票 / 支付宝、微信、USDT 等
+  - type: input
+    id: contact
+    attributes:
+      label: 联系方式
+      description: 邮箱、Telegram 或 QQ 群，用于核实信息
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      options:
+        - label: 以上信息真实，并同意 Folkbench 对站点进行公开检测与展示
+          required: true
