@@ -16,6 +16,7 @@
 - [六、Folkbench Switch 桌面端](#六folkbench-switch-桌面端)
 - [七、中转站常见问题 FAQ](#七中转站常见问题-faq)
 - [八、中转站申请收录 / 踩坑报告](#八中转站申请收录--踩坑报告)
+- [九、相关链接：中转站公开快照子站](#九相关链接中转站公开快照子站)
 - [更新日志](#更新日志)
 
 ---
@@ -315,8 +316,20 @@
 - 用户踩坑 / 问题反馈：[新建「问题反馈 / 踩坑报告」issue](../../issues/new?template=pitfall-report.yml)
 - 想改进本指南：见 [CONTRIBUTING.md](CONTRIBUTING.md)
 
+## 九、相关链接：中转站公开快照子站
+
+下面 6 个站点都由 Folkbench 公开快照每天生成，角度不同，可按需要查看。排序按站点规则，含合作档位与运营加权；部分数据为展示样本。
+
+- [AI API 中转站公开快照（中转站排行）](https://folkbench.github.io/relay-rank/?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend&utm_content=relay-rank)：按模型查看各中转站的公开快照记录与站点档案。
+- [中转站探针公开快照周报](https://folkbench.github.io/integrity-weekly/?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend&utm_content=integrity-weekly)：每周汇总已公开的模型身份探针结果。
+- [AI 中转站模型对比](https://ai-relay-bench.github.io/?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend&utm_content=ai-relay-bench)：同一模型在各中转站的可用率、稳定性与公开价格对比。
+- [AI API 公开价格快照](https://aiapi-rank.github.io/?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend&utm_content=aiapi-rank)：按模型汇总中转站公开标价，并按厂商列出相关站点。
+- [AI 中转站公开目录](https://ai-zhongzhuan.github.io/?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend&utm_content=ai-zhongzhuan)：中转站目录、站点档案、支付与发票资料和新手指南。
+- [模型身份探针公开快照](https://ai-model-check.github.io/?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend&utm_content=ai-model-check)：按模型和站点查看身份探针一致率与指纹观察；单次结果不能证明模型被替换。
+
 ## 更新日志
 
+- **2026-11-17 23:30**：新增「相关链接」一节，列出 6 个中转站公开快照子站。
 - **2026-11-17 22:45**：按 Folkbench 中转站列表页刷新分站数据快照（25 家，新增 ModelPod；Zashmodel 位次、可用率和延迟有更新）。
 - **2026-11-17**：仓库创建。加入选站标准、风险提醒、自测方法、Folkbench 分站数据快照（24 家）、需谨慎收录标准、Folkbench Switch 0.1.0-beta.8 说明和 FAQ。
 
