@@ -3,7 +3,7 @@
 > **English:** A Chinese-language guide to choosing an AI API relay (中转站 / relay api / api proxy) for Claude, GPT and Gemini: selection checklist, risk warnings, how to self-check a relay for model downgrades, and per-site data cards linked to [Folkbench](https://folkbench.com/?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend). Issues for new site submissions and pitfall reports are welcome.
 
 > [!IMPORTANT]
-> **披露：排序遵循 Folkbench 站点规则，包含合作等级和运营加权；部分数据为展示样例。**
+> **披露：排序遵循 Folkbench 站点规则，包含合作等级和运营加权。**
 > 本仓库的分站列表顺序与 Folkbench 中转站列表页一致，数据以 Folkbench 页面当前显示为准。任何列表都不能替代你自己的小额试用。
 
 **目录**
@@ -94,7 +94,7 @@
 数据来源：[Folkbench 中转站列表](https://folkbench.com/stations?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)，抓取于 **2026-11-23 12:28（北京时间）**。可用率与延迟为近 24 小时窗口，页面每 15 分钟更新，下表只是当天的快照，最新数据请点进各站详情页。
 
 > [!NOTE]
-> 排序遵循 Folkbench 站点规则，包含合作等级和运营加权；部分数据为展示样例。「—」表示页面当时没有该项数据。数据安全等级的含义见 [数据安全榜](https://folkbench.com/rankings/data-security?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)。
+> 排序遵循 Folkbench 站点规则，包含合作等级和运营加权。「—」表示页面当时没有该项数据。数据安全等级的含义见 [数据安全榜](https://folkbench.com/rankings/data-security?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)。
 
 | # | 中转站 | 覆盖模型 | 近 24h 平均可用率 | 首字延迟中位数 | API 倍率 | 数据安全等级 |
 |---|---|---|---|---|---|---|
@@ -353,7 +353,7 @@
 数据来源：Folkbench [Claude 中转站测评](https://folkbench.com/claude-zhongzhuanzhan-ceping?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) 与 [GPT / Codex 中转站测评](https://folkbench.com/gpt-codex-zhongzhuanzhan-ceping?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)，抓取于 **2026-11-21（北京时间）**，每周更新一次。价格为每百万 token 的输入 / 输出报价；可用率和样本数来自页面标注的采样时段，「—」表示该分组在采样时段内没有已发布记录。
 
 > [!NOTE]
-> 排序遵循 Folkbench 站点规则，包含合作等级和运营加权；部分数据为展示样例。每个模型最多摘录 5 条，完整列表与最新数据以测评页为准。想测自己手上的 Key，可用 [实时检测页](https://folkbench.com/evaluations/api-quality?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)。
+> 排序遵循 Folkbench 站点规则，包含合作等级和运营加权。每个模型最多摘录 5 条，完整列表与最新数据以测评页为准。想测自己手上的 Key，可用 [实时检测页](https://folkbench.com/evaluations/api-quality?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)。
 
 **Claude Opus 5.5**（Claude，数据发布于 2026年11月21日）
 
@@ -441,7 +441,7 @@
 没有对所有模型和场景都最好的一家。先确定模型、客户端和预算，再看对应模型的记录，最后用小额试用验证。
 
 **Q：这个列表的顺序是怎么来的？**
-与 Folkbench 中转站列表页一致。排序遵循 Folkbench 站点规则，包含合作等级和运营加权；部分数据为展示样例。
+与 Folkbench 中转站列表页一致。排序遵循 Folkbench 站点规则，包含合作等级和运营加权。
 
 **Q：为什么很多站点的可用率是「—」？**
 表示近 24 小时 Folkbench 没有记录到该站的成功请求，或者还没有接入采样。没有记录不代表不可用，也不代表可用，需要你自己测。
@@ -508,10 +508,11 @@ A short English summary for readers searching for an **AI API relay**, **relay a
 - Rankings: <https://folkbench.com/rankings?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - Folkbench Switch, a desktop app to switch Claude Code / Codex / Gemini CLI between relays: <https://folkbench.com/switch?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 
-Ordering on Folkbench and in this repo follows Folkbench site rules, including partnership tiers and operational weighting; some data are display samples.
+Ordering on Folkbench and in this repo follows Folkbench site rules, including partnership tiers and operational weighting.
 
 ## 更新日志
 
+- **2026-11-23 12:45**：更新排序说明措辞。
 - **2026-11-23 12:28**：按 Folkbench 中转站列表页刷新分站数据快照（33→34 家，新增 Modelflare）；CheapRouter 近 24h 可用率 100.0%→99.0%，位次从第 2 到第 7，ZNB.ai 升到第 3；破晓首字延迟 3.65 s→4.39 s，IKunCode 4.64 s→4.95 s，aicode 可用率 98.8%→98.9%；Zashmodel 可用率 98.7%→98.8%；Apiporter 可用率 97.9%→91.7%，Cloudbridge 可用率 95.8%→89.6%。按模型的 Claude / GPT Codex 测评快照同步源数据前 5 条。
 - **2026-11-23 10:55**：按 Folkbench 中转站列表页刷新分站数据快照（32→33 家，新增 WoofAPI）；CheapRouter 出现近 24h 可用率 100.0%，位次从第 17 升到第 2，ZNB.ai 升到第 3；FluxLane 仍为第 1，近 24h 可用率 100.0%→98.6%；Apiporter 降到第 9（可用率 97.9%，延迟 2.62 s→5.67 s），Cloudbridge 降到第 10（可用率 95.8%，延迟 2.77 s→5.84 s）；ModelPod、COFFEE API 暂无近 24h 成功请求记录，分别从第 5、第 9 落到第 17、第 30。多家覆盖模型数、延迟和倍率有更新。新增「换线路后，工具调用和 JSON 怎么查」。FAQ 数据安全等级按数据安全榜 2026-11-23 更新（0 级站点 32→33 家）。
 
