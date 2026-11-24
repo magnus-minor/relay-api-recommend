@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        感谢提交！请如实填写。本仓库分站数据跟随 Folkbench 页面，排序遵循 Folkbench 站点规则，包含合作等级和运营加权；部分数据为展示样例。
+        感谢提交！请如实填写。本仓库分站数据跟随 Folkbench 页面，排序遵循 Folkbench 站点规则，包含合作等级和运营加权。
         也可以直接走 Folkbench 站长入驻：https://folkbench.com/vendor-join?utm_source=github&utm_medium=issue&utm_campaign=relay-recommend
         **请不要在 issue 里粘贴任何 API Key。**
   - type: input

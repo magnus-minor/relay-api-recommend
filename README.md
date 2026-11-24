@@ -12,6 +12,7 @@
 - [二、中转站充值风险提醒](#二中转站充值风险提醒)
 - [三、如何自己检测一个中转站（降智 / 掺假）](#三如何自己检测一个中转站降智--掺假)
   - [换线路后，工具调用和 JSON 怎么查](#换线路后工具调用和-json-怎么查)
+  - [缓存计费怎么核对](#缓存计费怎么核对)
 - [四、中转站推荐列表与分站数据（来自 Folkbench）](#四中转站推荐列表与分站数据来自-folkbench)
 - [五、需谨慎的中转站](#五需谨慎的中转站)
 - [六、Folkbench Switch 桌面端](#六folkbench-switch-桌面端)
@@ -89,49 +90,61 @@
 
 相关说明还可以看：[API 中转站可靠性检查](https://folkbench.com/blog/api-relay-reliability-checks?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)、[写代码场景下的评测指南](https://folkbench.com/blog/ai-api-relay-software-engineering-evaluation-guide?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)。
 
+### 缓存计费怎么核对
+
+Claude Code、Codex 这类编程客户端每一轮都会重发大段相同的系统提示、文件内容和历史对话，缓存能不能命中、命中后怎么计价，往往比输入单价更影响实际花费。注意：上面列表里的「API 倍率」和测评页表格只是普通输入 / 输出报价，不能拿来推算缓存价（Folkbench [Claude 中转站测评](https://folkbench.com/claude-zhongzhuanzhan-ceping?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) 的常见问题里也写明了这一点）。
+
+1. **四个单价分开问。** 普通输入、输出、缓存命中（读取）、缓存写入，按你要用的分组逐项确认；站点没写的项按「未提供」处理，不要用倍率去推。
+2. **看命中率，不只看折扣。** Folkbench 各站详情页的「缓存」一栏会列出缓存折扣、缓存命中单价、最近几轮热请求的实测命中次数，以及同行平均命中率。折扣写得再高，实测命中次数为 0 时，这个折扣对你的账单没有意义。
+3. **用自己的客户端测一次命中。** 在几分钟内连续发两次前缀完全相同的长请求（例如同一份不含敏感内容的长文档 + 不同的短问题），看第二次是否出现缓存读取 token。Anthropic Messages 一般要在请求里标 `cache_control` 才会走缓存；OpenAI 协议多为自动前缀缓存，且有最小长度要求。具体以官方文档和站点说明为准。
+4. **对照 usage 字段和扣费。** Anthropic Messages 看 `usage.cache_creation_input_tokens`（写入）和 `usage.cache_read_input_tokens`（读取）；OpenAI Chat Completions 看 `usage.prompt_tokens_details.cached_tokens`，Responses API 看 `usage.input_tokens_details.cached_tokens`。再按「缓存读取 token × 命中价 + 缓存写入 token × 写入价 + 未命中输入 × 输入价 + 输出 × 输出价」算一遍，和控制台扣费对不上，或返回里根本没有缓存字段，先问站点再加量。
+5. **用自己的命中率估算成本。** Folkbench [会话成本榜](https://folkbench.com/rankings/cost?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) 按每次编程会话 200 万输入、4 万输出 token 计算，不计缓存；各站详情页的「缓存加权的会话成本」可以拖动命中率重新计算（页面默认 80%，并注明编程 Agent 常见 70%–90%）。把第 3 步测出的命中率代进去，比直接看默认值更贴近你的账单。换线路或换分组后，重新测一次，不要沿用旧线路的命中率。
+
 ## 四、中转站推荐列表与分站数据（来自 Folkbench）
 
-数据来源：[Folkbench 中转站列表](https://folkbench.com/stations?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)，抓取于 **2026-11-23 12:28（北京时间）**。可用率与延迟为近 24 小时窗口，页面每 15 分钟更新，下表只是当天的快照，最新数据请点进各站详情页。
+数据来源：[Folkbench 中转站列表](https://folkbench.com/stations?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)，抓取于 **2026-11-24 10:42（北京时间）**。可用率与延迟为近 24 小时窗口，页面每 15 分钟更新，下表只是当天的快照，最新数据请点进各站详情页。
 
 > [!NOTE]
 > 排序遵循 Folkbench 站点规则，包含合作等级和运营加权。「—」表示页面当时没有该项数据。数据安全等级的含义见 [数据安全榜](https://folkbench.com/rankings/data-security?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)。
 
 | # | 中转站 | 覆盖模型 | 近 24h 平均可用率 | 首字延迟中位数 | API 倍率 | 数据安全等级 |
 |---|---|---|---|---|---|---|
-| 1 | [Modelflare](https://folkbench.com/services/modelflare?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 40 | 97.9% | 1.32 s | 0.25× | 4 级 |
-| 2 | [智流 FluxLane](https://folkbench.com/services/fluxlane?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 47 | 98.6% | 5.40 s | 0.12× | 2 级 |
-| 3 | [ZNB.ai](https://folkbench.com/services/znb-ai?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 29 | 100.0% | 2.62 s | 0.060× | 0 级 |
-| 4 | [Sidrune AI](https://folkbench.com/services/merchant-955eb49b-34a?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 47 | 99.3% | 4.83 s | 0.18× | 0 级 |
-| 5 | [破晓](https://folkbench.com/services/merchant-4cf2b788-920?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 25 | 99.2% | 4.39 s | 0.030× | 0 级 |
-| 6 | [IKunCode](https://folkbench.com/services/ikuncode?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 35 | 99.2% | 4.95 s | 0.15× | 0 级 |
-| 7 | [CheapRouter](https://folkbench.com/services/cheaprouter?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 29 | 99.0% | 3.71 s | 0.074× | 0 级 |
-| 8 | [aicode](https://folkbench.com/services/merchant-2b1bbef9-885?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 2 | 98.9% | 2.84 s | 0.066× | 0 级 |
-| 9 | [Zashmodel](https://folkbench.com/services/merchant-5cf7678f-611?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 36 | 98.8% | 3.08 s | 0.045× | 0 级 |
-| 10 | [Apiporter](https://folkbench.com/services/apiporter?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 12 | 91.7% | 5.67 s | 0.30× | 0 级 |
-| 11 | [Cloudbridge](https://folkbench.com/services/cloudbridge?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 11 | 89.6% | 5.84 s | 0.23× | 0 级 |
-| 12 | [CheapAI](https://folkbench.com/services/cheapai?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 48 | — | — | 0.045× | 3 级 |
-| 13 | [A6api](https://folkbench.com/services/a6api?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 67 | — | — | 0.072× | 0 级 |
-| 14 | [aicentos](https://folkbench.com/services/aicentos?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 26 | — | — | 0.22× | 0 级 |
-| 15 | [超稳API / Stable API](https://folkbench.com/services/apiniuma?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 65 | — | — | 0.15× | 0 级 |
-| 16 | [aruhub API](https://folkbench.com/services/aruhub?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 38 | — | — | 0.082× | 0 级 |
-| 17 | [金石API](https://folkbench.com/services/merchant-2047c972-456?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 31 | — | — | 0.12× | 0 级 |
+| 1 | [Modelflare](https://folkbench.com/services/modelflare?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 41 | 98.0% | 1.32 s | 0.25× | 4 级 |
+| 2 | [CheapAI](https://folkbench.com/services/cheapai?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 48 | 100.0% | 3.63 s | 0.045× | 3 级 |
+| 3 | [智流 FluxLane](https://folkbench.com/services/fluxlane?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 47 | 99.3% | 4.67 s | 0.12× | 2 级 |
+| 4 | [aicode](https://folkbench.com/services/merchant-2b1bbef9-885?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 2 | 100.0% | 2.74 s | 0.066× | 0 级 |
+| 5 | [破晓](https://folkbench.com/services/merchant-4cf2b788-920?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 25 | 100.0% | 5.29 s | 0.038× | 0 级 |
+| 6 | [ZNB.ai](https://folkbench.com/services/znb-ai?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 29 | 100.0% | 2.87 s | 0.060× | 0 级 |
+| 7 | [IKunCode](https://folkbench.com/services/ikuncode?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 35 | 98.3% | 4.67 s | 0.15× | 0 级 |
+| 8 | [Zashmodel](https://folkbench.com/services/merchant-5cf7678f-611?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 36 | 97.1% | 5.01 s | 0.045× | 0 级 |
+| 9 | [CheapRouter](https://folkbench.com/services/cheaprouter?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 29 | 95.8% | 6.55 s | 0.074× | 0 级 |
+| 10 | [Sidrune AI](https://folkbench.com/services/merchant-955eb49b-34a?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 47 | 86.8% | 4.07 s | 0.18× | 0 级 |
+| 11 | [Apiporter](https://folkbench.com/services/apiporter?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 12 | 54.2% | 2.55 s | 0.30× | 0 级 |
+| 12 | [Cloudbridge](https://folkbench.com/services/cloudbridge?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 11 | 52.1% | 6.17 s | 0.23× | 0 级 |
+| 13 | [A6api](https://folkbench.com/services/a6api?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 66 | — | — | 0.081× | 0 级 |
+| 14 | [aicentos](https://folkbench.com/services/aicentos?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 33 | — | — | 0.20× | 0 级 |
+| 15 | [超稳API / Stable API](https://folkbench.com/services/apiniuma?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 67 | — | — | 0.15× | 0 级 |
+| 16 | [aruhub API](https://folkbench.com/services/aruhub?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 37 | — | — | 0.082× | 0 级 |
+| 17 | [金石API](https://folkbench.com/services/merchant-2047c972-456?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 32 | — | — | 0.10× | 0 级 |
 | 18 | [ModelPod](https://folkbench.com/services/merchant-27af1806-16e?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 25 | — | — | 0.15× | 0 级 |
-| 19 | [序点算力](https://folkbench.com/services/merchant-2e16cda8-294?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 25 | — | — | 0.045× | 0 级 |
-| 20 | [飞梁API](https://folkbench.com/services/merchant-316d7f43-b18?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 37 | — | — | 0.037× | 0 级 |
-| 21 | [HardysAPI](https://folkbench.com/services/merchant-3e458582-c5c?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 64 | — | — | 0.14× | 0 级 |
-| 22 | [AIGROW](https://folkbench.com/services/merchant-5be36043-bc1?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 8 | — | — | — | 0 级 |
-| 23 | [FlyRouter](https://folkbench.com/services/merchant-618ddad0-3b3?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 32 | — | — | 0.25× | 0 级 |
-| 24 | [Buytoken](https://folkbench.com/services/merchant-72e9eb4a-5e0?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 24 | — | — | 0.097× | 0 级 |
-| 25 | [久连 9Link](https://folkbench.com/services/merchant-7a09254e-f3f?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 6 | — | — | 0.089× | 0 级 |
-| 26 | [yukinahub](https://folkbench.com/services/merchant-80a0ee87-bc3?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 38 | — | — | 0.037× | 0 级 |
-| 27 | [SU8 Codes](https://folkbench.com/services/merchant-9adafd15-54e?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | — | — | — | — | 0 级 |
-| 28 | [TokenMilo](https://folkbench.com/services/merchant-bf7e2fcb-e08?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 15 | — | — | 0.21× | 0 级 |
-| 29 | [简渡API](https://folkbench.com/services/merchant-cd814303-0b7?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | — | — | — | — | 0 级 |
-| 30 | [GQuick AI](https://folkbench.com/services/merchant-d1c1e380-bb9?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 12 | — | — | 0.097× | 0 级 |
-| 31 | [COFFEE API](https://folkbench.com/services/merchant-dbbb1c95-135?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 13 | — | — | 0.18× | 0 级 |
-| 32 | [XINGYI API](https://folkbench.com/services/merchant-deafb24c-c5f?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | — | — | — | — | 0 级 |
-| 33 | [兽浮云中转站](https://folkbench.com/services/shoufuyun?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 2 | — | — | 0.015× | 0 级 |
-| 34 | [WoofAPI](https://folkbench.com/services/woof-api?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 44 | — | — | 0.13× | 0 级 |
+| 19 | [序点算力](https://folkbench.com/services/merchant-2e16cda8-294?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 26 | — | — | 0.045× | 0 级 |
+| 20 | [飞梁API](https://folkbench.com/services/merchant-316d7f43-b18?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 38 | — | — | 0.071× | 0 级 |
+| 21 | [悟空API](https://folkbench.com/services/merchant-327d469e-851?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 49 | — | — | 0.22× | 0 级 |
+| 22 | [HardysAPI](https://folkbench.com/services/merchant-3e458582-c5c?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 69 | — | — | 0.15× | 0 级 |
+| 23 | [AIGROW](https://folkbench.com/services/merchant-5be36043-bc1?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 8 | — | — | — | 0 级 |
+| 24 | [FlyRouter](https://folkbench.com/services/merchant-618ddad0-3b3?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 31 | — | — | 0.25× | 0 级 |
+| 25 | [Buytoken](https://folkbench.com/services/merchant-72e9eb4a-5e0?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 24 | — | — | 0.097× | 0 级 |
+| 26 | [久连 9Link](https://folkbench.com/services/merchant-7a09254e-f3f?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 6 | — | — | 0.089× | 0 级 |
+| 27 | [yukinahub](https://folkbench.com/services/merchant-80a0ee87-bc3?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 38 | — | — | 0.037× | 0 级 |
+| 28 | [SU8 Codes](https://folkbench.com/services/merchant-9adafd15-54e?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | — | — | — | — | 0 级 |
+| 29 | [TokenMilo](https://folkbench.com/services/merchant-bf7e2fcb-e08?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 15 | — | — | 0.21× | 0 级 |
+| 30 | [简渡API](https://folkbench.com/services/merchant-cd814303-0b7?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | — | — | — | — | 0 级 |
+| 31 | [GQuick AI](https://folkbench.com/services/merchant-d1c1e380-bb9?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 12 | — | — | 0.097× | 0 级 |
+| 32 | [COFFEE API](https://folkbench.com/services/merchant-dbbb1c95-135?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 13 | — | — | 0.18× | 0 级 |
+| 33 | [XINGYI API](https://folkbench.com/services/merchant-deafb24c-c5f?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | — | — | — | — | 0 级 |
+| 34 | [NexoToken](https://folkbench.com/services/nexotoken?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 48 | — | — | 0.15× | 0 级 |
+| 35 | [兽浮云中转站](https://folkbench.com/services/shoufuyun?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 2 | — | — | 0.015× | 0 级 |
+| 36 | [WoofAPI](https://folkbench.com/services/woof-api?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) | 40 | — | — | 0.13× | 0 级 |
 
 ### 分站资料卡
 
@@ -140,113 +153,113 @@
 #### 1. Modelflare
 
 - Folkbench 详情页：<https://folkbench.com/services/modelflare?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 40，近 24 小时平均可用率 97.9%，首字延迟中位数 1.32 s，API 倍率 0.25×，数据安全 4 级
+- 列表页数据：覆盖模型 41，近 24 小时平均可用率 98.0%，首字延迟中位数 1.32 s，API 倍率 0.25×，数据安全 4 级
 - 服务信息：充值门槛：5 USD；注册赠送：US$0.25；客服响应：随时；支付方式：支付宝、微信支付、银行卡、USDT、PayPal；国内发票：支持；退款：支持
 - 页面列出的优点：持续运营，主体明确：已运营半年以上，由美国有限责任公司 Havenbyte LLC 运营。
 - 页面列出的不足：特惠分组有充值门槛：GPT、Claude 特惠分组分别需要单笔充值 US$20、US$50 才能解锁。
 
-#### 2. 智流 FluxLane
-
-- Folkbench 详情页：<https://folkbench.com/services/fluxlane?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 47，近 24 小时平均可用率 98.6%，首字延迟中位数 5.40 s，API 倍率 0.12×，数据安全 2 级
-- 服务信息：充值门槛：10 CNY；注册赠送：注册赠送2美元；客服响应：工作日30分钟内；支付方式：支付宝、微信支付；国内发票：支持；退款：支持
-
-#### 3. ZNB.ai
-
-- Folkbench 详情页：<https://folkbench.com/services/znb-ai?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 29，近 24 小时平均可用率 100.0%，首字延迟中位数 2.62 s，API 倍率 0.060×，数据安全 0 级
-- 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：未提供；国内发票：未提供；退款：未提供
-
-#### 4. Sidrune AI
-
-- Folkbench 详情页：<https://folkbench.com/services/merchant-955eb49b-34a?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 47，近 24 小时平均可用率 99.3%，首字延迟中位数 4.83 s，API 倍率 0.18×，数据安全 0 级
-- 服务信息：充值门槛：¥10；注册赠送：¥0；客服响应：未提供；支付方式：支付宝、微信支付、USDT；国内发票：支持；退款：支持
-
-#### 5. 破晓
-
-- Folkbench 详情页：<https://folkbench.com/services/merchant-4cf2b788-920?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 25，近 24 小时平均可用率 99.2%，首字延迟中位数 4.39 s，API 倍率 0.030×，数据安全 0 级
-- 服务信息：充值门槛：¥10；注册赠送：未提供；客服响应：未提供；支付方式：支付宝、微信支付；国内发票：支持；退款：支持
-
-#### 6. IKunCode
-
-- Folkbench 详情页：<https://folkbench.com/services/ikuncode?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 35，近 24 小时平均可用率 99.2%，首字延迟中位数 4.95 s，API 倍率 0.15×，数据安全 0 级
-- 服务信息：充值门槛：5 CNY；注册赠送：0；客服响应：开票请提前联系客服；支付方式：支付宝、微信支付；国内发票：支持；退款：支持
-- 页面列出的优点：有完善的售后群，客服响应快
-- 页面列出的不足：扩展更多的定价分组
-
-#### 7. CheapRouter
-
-- Folkbench 详情页：<https://folkbench.com/services/cheaprouter?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 29，近 24 小时平均可用率 99.0%，首字延迟中位数 3.71 s，API 倍率 0.074×，数据安全 0 级
-- 服务信息：充值门槛：¥10；注册赠送：未提供；客服响应：工作日4小时内；支付方式：支付宝、微信支付、银行卡、USDT、其他；国内发票：支持；退款：有条件
-
-#### 8. aicode
-
-- Folkbench 详情页：<https://folkbench.com/services/merchant-2b1bbef9-885?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 2，近 24 小时平均可用率 98.9%，首字延迟中位数 2.84 s，API 倍率 0.066×，数据安全 0 级
-- 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：微信支付、支付宝；国内发票：未核实；退款：未核实
-
-#### 9. Zashmodel
-
-- Folkbench 详情页：<https://folkbench.com/services/merchant-5cf7678f-611?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 36，近 24 小时平均可用率 98.8%，首字延迟中位数 3.08 s，API 倍率 0.045×，数据安全 0 级
-- 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：微信支付、银行卡、PayPal、其他；国内发票：未核实；退款：未核实
-
-#### 10. Apiporter
-
-- Folkbench 详情页：<https://folkbench.com/services/apiporter?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 12，近 24 小时平均可用率 91.7%，首字延迟中位数 5.67 s，API 倍率 0.30×，数据安全 0 级
-- 服务信息：充值门槛：¥5；注册赠送：¥0.4；客服响应：工作日内1小时；支付方式：支付宝、其他；国内发票：支持；退款：需联系客服
-- 页面列出的优点：起充较低，并且支持任意金额可开票
-- 页面列出的不足：增强claude模型的稳定性，减少443出现
-
-#### 11. Cloudbridge
-
-- Folkbench 详情页：<https://folkbench.com/services/cloudbridge?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 11，近 24 小时平均可用率 89.6%，首字延迟中位数 5.84 s，API 倍率 0.23×，数据安全 0 级
-- 服务信息：充值门槛：1 USD；注册赠送：0.2美元；客服响应：工作日1小时内；支付方式：支付宝、微信支付、银行卡、PayPal、其他；国内发票：不支持；退款：需联系客服
-- 页面列出的优点：在智谱、DeepSeek 等国产模型上具备价格优势
-- 页面列出的不足：提高模型可用率和响应速度
-
-#### 12. CheapAI
+#### 2. CheapAI
 
 - Folkbench 详情页：<https://folkbench.com/services/cheapai?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 48，近 24 小时暂无成功请求记录，API 倍率 0.045×，数据安全 3 级
+- 列表页数据：覆盖模型 48，近 24 小时平均可用率 100.0%，首字延迟中位数 3.63 s，API 倍率 0.045×，数据安全 3 级
 - 服务信息：充值门槛：20 USD；注册赠送：无；客服响应：工作日 4 小时内；支付方式：支付宝、微信支付、银行卡、其他；国内发票：支持；退款：有条件
 - 页面列出的优点：价格极低，主打源头中转：官方宣传 0.08 倍费率、1 倍汇率，定位“GPT 源头中转，不限并发”。
 - 页面列出的不足：长上下文场景的可靠性需要加强
 
+#### 3. 智流 FluxLane
+
+- Folkbench 详情页：<https://folkbench.com/services/fluxlane?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 47，近 24 小时平均可用率 99.3%，首字延迟中位数 4.67 s，API 倍率 0.12×，数据安全 2 级
+- 服务信息：充值门槛：10 CNY；注册赠送：注册赠送2美元；客服响应：工作日30分钟内；支付方式：支付宝、微信支付；国内发票：支持；退款：支持
+
+#### 4. aicode
+
+- Folkbench 详情页：<https://folkbench.com/services/merchant-2b1bbef9-885?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 2，近 24 小时平均可用率 100.0%，首字延迟中位数 2.74 s，API 倍率 0.066×，数据安全 0 级
+- 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：微信支付、支付宝；国内发票：未核实；退款：未核实
+
+#### 5. 破晓
+
+- Folkbench 详情页：<https://folkbench.com/services/merchant-4cf2b788-920?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 25，近 24 小时平均可用率 100.0%，首字延迟中位数 5.29 s，API 倍率 0.038×，数据安全 0 级
+- 服务信息：充值门槛：¥10；注册赠送：未提供；客服响应：未提供；支付方式：支付宝、微信支付；国内发票：支持；退款：支持
+
+#### 6. ZNB.ai
+
+- Folkbench 详情页：<https://folkbench.com/services/znb-ai?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 29，近 24 小时平均可用率 100.0%，首字延迟中位数 2.87 s，API 倍率 0.060×，数据安全 0 级
+- 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：未提供；国内发票：未提供；退款：未提供
+
+#### 7. IKunCode
+
+- Folkbench 详情页：<https://folkbench.com/services/ikuncode?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 35，近 24 小时平均可用率 98.3%，首字延迟中位数 4.67 s，API 倍率 0.15×，数据安全 0 级
+- 服务信息：充值门槛：5 CNY；注册赠送：0；客服响应：开票请提前联系客服；支付方式：支付宝、微信支付；国内发票：支持；退款：支持
+- 页面列出的优点：有完善的售后群，客服响应快
+- 页面列出的不足：扩展更多的定价分组
+
+#### 8. Zashmodel
+
+- Folkbench 详情页：<https://folkbench.com/services/merchant-5cf7678f-611?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 36，近 24 小时平均可用率 97.1%，首字延迟中位数 5.01 s，API 倍率 0.045×，数据安全 0 级
+- 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：微信支付、银行卡、PayPal、其他；国内发票：未核实；退款：未核实
+
+#### 9. CheapRouter
+
+- Folkbench 详情页：<https://folkbench.com/services/cheaprouter?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 29，近 24 小时平均可用率 95.8%，首字延迟中位数 6.55 s，API 倍率 0.074×，数据安全 0 级
+- 服务信息：充值门槛：¥10；注册赠送：未提供；客服响应：工作日4小时内；支付方式：支付宝、微信支付、银行卡、USDT、其他；国内发票：支持；退款：有条件
+
+#### 10. Sidrune AI
+
+- Folkbench 详情页：<https://folkbench.com/services/merchant-955eb49b-34a?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 47，近 24 小时平均可用率 86.8%，首字延迟中位数 4.07 s，API 倍率 0.18×，数据安全 0 级
+- 服务信息：充值门槛：¥10；注册赠送：¥0；客服响应：未提供；支付方式：支付宝、微信支付、USDT；国内发票：支持；退款：支持
+
+#### 11. Apiporter
+
+- Folkbench 详情页：<https://folkbench.com/services/apiporter?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 12，近 24 小时平均可用率 54.2%，首字延迟中位数 2.55 s，API 倍率 0.30×，数据安全 0 级
+- 服务信息：充值门槛：¥5；注册赠送：¥0.4；客服响应：工作日内1小时；支付方式：支付宝、其他；国内发票：支持；退款：需联系客服
+- 页面列出的优点：起充较低，并且支持任意金额可开票
+- 页面列出的不足：增强claude模型的稳定性，减少443出现
+
+#### 12. Cloudbridge
+
+- Folkbench 详情页：<https://folkbench.com/services/cloudbridge?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 11，近 24 小时平均可用率 52.1%，首字延迟中位数 6.17 s，API 倍率 0.23×，数据安全 0 级
+- 服务信息：充值门槛：1 USD；注册赠送：0.2美元；客服响应：工作日1小时内；支付方式：支付宝、微信支付、银行卡、PayPal、其他；国内发票：不支持；退款：需联系客服
+- 页面列出的优点：在智谱、DeepSeek 等国产模型上具备价格优势
+- 页面列出的不足：提高模型可用率和响应速度
+
 #### 13. A6api
 
 - Folkbench 详情页：<https://folkbench.com/services/a6api?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 67，近 24 小时暂无成功请求记录，API 倍率 0.072×，数据安全 0 级
+- 列表页数据：覆盖模型 66，近 24 小时暂无成功请求记录，API 倍率 0.081×，数据安全 0 级
 - 服务信息：充值门槛：¥10；注册赠送：未提供；客服响应：无；支付方式：支付宝、微信支付、银行卡、USDT、其他；国内发票：未核实；退款：未核实
 
 #### 14. aicentos
 
 - Folkbench 详情页：<https://folkbench.com/services/aicentos?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 26，近 24 小时暂无成功请求记录，API 倍率 0.22×，数据安全 0 级
+- 列表页数据：覆盖模型 33，近 24 小时暂无成功请求记录，API 倍率 0.20×，数据安全 0 级
 - 服务信息：充值门槛：未提供；注册赠送：¥1；客服响应：未提供；支付方式：支付宝、微信支付、其他；国内发票：支持；退款：支持
 
 #### 15. 超稳API / Stable API
 
 - Folkbench 详情页：<https://folkbench.com/services/apiniuma?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 65，近 24 小时暂无成功请求记录，API 倍率 0.15×，数据安全 0 级
+- 列表页数据：覆盖模型 67，近 24 小时暂无成功请求记录，API 倍率 0.15×，数据安全 0 级
 - 服务信息：充值门槛：$1；注册赠送：未提供；客服响应：新加坡时间周一至周五 10:00-17:30（以官网公示客服时间为准）；支付方式：支付宝、微信支付、其他；国内发票：未核实；退款：未核实
 
 #### 16. aruhub API
 
 - Folkbench 详情页：<https://folkbench.com/services/aruhub?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 38，近 24 小时暂无成功请求记录，API 倍率 0.082×，数据安全 0 级
+- 列表页数据：覆盖模型 37，近 24 小时暂无成功请求记录，API 倍率 0.082×，数据安全 0 级
 - 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：其他；国内发票：未核实；退款：未核实
 
 #### 17. 金石API
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-2047c972-456?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 31，近 24 小时暂无成功请求记录，API 倍率 0.12×，数据安全 0 级
+- 列表页数据：覆盖模型 32，近 24 小时暂无成功请求记录，API 倍率 0.10×，数据安全 0 级
 - 服务信息：充值门槛：¥1；注册赠送：未提供；客服响应：未提供；支付方式：支付宝、微信支付；国内发票：有条件；退款：未核实
 
 #### 18. ModelPod
@@ -258,162 +271,172 @@
 #### 19. 序点算力
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-2e16cda8-294?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 25，近 24 小时暂无成功请求记录，API 倍率 0.045×，数据安全 0 级
+- 列表页数据：覆盖模型 26，近 24 小时暂无成功请求记录，API 倍率 0.045×，数据安全 0 级
 - 服务信息：充值门槛：¥10；注册赠送：未提供；客服响应：无；支付方式：微信支付；国内发票：支持；退款：不支持
 
 #### 20. 飞梁API
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-316d7f43-b18?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 37，近 24 小时暂无成功请求记录，API 倍率 0.037×，数据安全 0 级
+- 列表页数据：覆盖模型 38，近 24 小时暂无成功请求记录，API 倍率 0.071×，数据安全 0 级
 - 服务信息：充值门槛：¥1；注册赠送：¥1；客服响应：8:00-23:30；支付方式：支付宝、微信支付；国内发票：不支持；退款：有条件
 
-#### 21. HardysAPI
+#### 21. 悟空API
+
+- Folkbench 详情页：<https://folkbench.com/services/merchant-327d469e-851?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 49，近 24 小时暂无成功请求记录，API 倍率 0.22×，数据安全 0 级
+- 服务信息：充值门槛：¥1；注册赠送：未提供；客服响应：未提供；支付方式：支付宝、微信支付；国内发票：支持；退款：支持
+
+#### 22. HardysAPI
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-3e458582-c5c?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 64，近 24 小时暂无成功请求记录，API 倍率 0.14×，数据安全 0 级
+- 列表页数据：覆盖模型 69，近 24 小时暂无成功请求记录，API 倍率 0.15×，数据安全 0 级
 - 服务信息：充值门槛：¥10；注册赠送：¥0.1；客服响应：8小时内；支付方式：微信支付、支付宝、USDT、其他；国内发票：不适用；退款：不支持
 
-#### 22. AIGROW
+#### 23. AIGROW
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-5be36043-bc1?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 8，近 24 小时暂无成功请求记录，API 倍率 —，数据安全 0 级
 - 服务信息：退款：条件支持
 
-#### 23. FlyRouter
+#### 24. FlyRouter
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-618ddad0-3b3?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 32，近 24 小时暂无成功请求记录，API 倍率 0.25×，数据安全 0 级
+- 列表页数据：覆盖模型 31，近 24 小时暂无成功请求记录，API 倍率 0.25×，数据安全 0 级
 - 服务信息：充值门槛：$1；注册赠送：$1；客服响应：半小时内；支付方式：银行卡、微信支付、支付宝；国内发票：有条件；退款：有条件
 
-#### 24. Buytoken
+#### 25. Buytoken
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-72e9eb4a-5e0?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 24，近 24 小时暂无成功请求记录，API 倍率 0.097×，数据安全 0 级
 - 服务信息：充值门槛：¥10；注册赠送：未提供；客服响应：无；支付方式：支付宝、微信支付、银行卡；国内发票：支持；退款：支持
 
-#### 25. 久连 9Link
+#### 26. 久连 9Link
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-7a09254e-f3f?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 6，近 24 小时暂无成功请求记录，API 倍率 0.089×，数据安全 0 级
 - 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：微信支付、支付宝；国内发票：支持；退款：支持
 
-#### 26. yukinahub
+#### 27. yukinahub
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-80a0ee87-bc3?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 38，近 24 小时暂无成功请求记录，API 倍率 0.037×，数据安全 0 级
 - 服务信息：充值门槛：¥10；注册赠送：未提供；客服响应：无；支付方式：支付宝、微信支付、USDT；国内发票：未核实；退款：未核实
 
-#### 27. SU8 Codes
+#### 28. SU8 Codes
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-9adafd15-54e?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 —，近 24 小时暂无成功请求记录，API 倍率 —，数据安全 0 级
 
-#### 28. TokenMilo
+#### 29. TokenMilo
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-bf7e2fcb-e08?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 15，近 24 小时暂无成功请求记录，API 倍率 0.21×，数据安全 0 级
 - 服务信息：充值门槛：¥50；注册赠送：$5；客服响应：北京时间 9:00–22:00 在线；支付方式：微信支付；国内发票：不支持；退款：有条件
 
-#### 29. 简渡API
+#### 30. 简渡API
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-cd814303-0b7?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 —，近 24 小时暂无成功请求记录，API 倍率 —，数据安全 0 级
 
-#### 30. GQuick AI
+#### 31. GQuick AI
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-d1c1e380-bb9?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 12，近 24 小时暂无成功请求记录，API 倍率 0.097×，数据安全 0 级
 - 服务信息：充值门槛：¥10；注册赠送：¥0；客服响应：1小时内；支付方式：微信支付、支付宝、其他；国内发票：未核实；退款：未核实
 
-#### 31. COFFEE API
+#### 32. COFFEE API
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-dbbb1c95-135?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 13，近 24 小时暂无成功请求记录，API 倍率 0.18×，数据安全 0 级
 - 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：微信支付、支付宝；国内发票：未核实；退款：未核实
 
-#### 32. XINGYI API
+#### 33. XINGYI API
 
 - Folkbench 详情页：<https://folkbench.com/services/merchant-deafb24c-c5f?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 —，近 24 小时暂无成功请求记录，API 倍率 —，数据安全 0 级
 
-#### 33. 兽浮云中转站
+#### 34. NexoToken
+
+- Folkbench 详情页：<https://folkbench.com/services/nexotoken?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
+- 列表页数据：覆盖模型 48，近 24 小时暂无成功请求记录，API 倍率 0.15×，数据安全 0 级
+- 服务信息：充值门槛：未提供；注册赠送：未提供；客服响应：未提供；支付方式：支付宝、微信支付；国内发票：支持；退款：需联系客服
+
+#### 35. 兽浮云中转站
 
 - Folkbench 详情页：<https://folkbench.com/services/shoufuyun?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
 - 列表页数据：覆盖模型 2，近 24 小时暂无成功请求记录，API 倍率 0.015×，数据安全 0 级
 - 服务信息：充值门槛：¥10；注册赠送：未提供；客服响应：全天；支付方式：微信支付、支付宝；国内发票：不适用；退款：支持
 
-#### 34. WoofAPI
+#### 36. WoofAPI
 
 - Folkbench 详情页：<https://folkbench.com/services/woof-api?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend>
-- 列表页数据：覆盖模型 44，近 24 小时暂无成功请求记录，API 倍率 0.13×，数据安全 0 级
+- 列表页数据：覆盖模型 40，近 24 小时暂无成功请求记录，API 倍率 0.13×，数据安全 0 级
 - 服务信息：充值门槛：¥1；注册赠送：¥1；客服响应：工作日1小时内；支付方式：支付宝、USDT；国内发票：支持；退款：支持
 
 ### 按模型的 Claude / GPT Codex 测评快照
 
-数据来源：Folkbench [Claude 中转站测评](https://folkbench.com/claude-zhongzhuanzhan-ceping?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) 与 [GPT / Codex 中转站测评](https://folkbench.com/gpt-codex-zhongzhuanzhan-ceping?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)，抓取于 **2026-11-21（北京时间）**，每周更新一次。价格为每百万 token 的输入 / 输出报价；可用率和样本数来自页面标注的采样时段，「—」表示该分组在采样时段内没有已发布记录。
+数据来源：Folkbench [Claude 中转站测评](https://folkbench.com/claude-zhongzhuanzhan-ceping?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend) 与 [GPT / Codex 中转站测评](https://folkbench.com/gpt-codex-zhongzhuanzhan-ceping?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)，抓取于 **2026-11-24（北京时间）**，每周更新一次。价格为每百万 token 的输入 / 输出报价；可用率和样本数来自页面标注的采样时段，「—」表示该分组在采样时段内没有已发布记录。
 
 > [!NOTE]
 > 排序遵循 Folkbench 站点规则，包含合作等级和运营加权。每个模型最多摘录 5 条，完整列表与最新数据以测评页为准。想测自己手上的 Key，可用 [实时检测页](https://folkbench.com/evaluations/api-quality?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend)。
 
-**Claude Opus 5.5**（Claude，数据发布于 2026年11月21日）
+**Claude Opus 5.5**（Claude，数据发布于 2026年11月24日）
 
 | 中转站 | 分组 | 可用率 | 输入 | 输出 | 样本数 |
 |---|---|---|---|---|---|
-| Modelflare | claude-first-topup | 98.08% | ¥0.80 | ¥3.98 | 104 |
+| Modelflare | claude-first-topup | 97.85% | ¥0.80 | ¥3.98 | 186 |
 | IKunCode | cc-kiro | 100.00% | ¥4.00 | ¥20.00 | 48 |
-| Apiporter | Claude_core | — | ¥8.00 | ¥40.00 | — |
-| 智流 FluxLane | Claude-Max｜满血旗舰 | 97.92% | ¥4.80 | ¥24.00 | 48 |
-| ZNB.ai | znb-cc-特惠 | — | ¥0.60 | ¥3.00 | — |
+| 智流 FluxLane | Claude-Max｜满血旗舰 | 100.00% | ¥4.80 | ¥24.00 | 48 |
+| CheapAI | claude-kiro-跌破底价 | — | ¥0.48 | ¥2.40 | — |
+| CheapRouter | Claude促销分组 | 97.92% | ¥2.00 | ¥10.00 | 48 |
 
-**Claude Fable 5.1**（Claude，数据发布于 2026年11月21日）
-
-| 中转站 | 分组 | 可用率 | 输入 | 输出 | 样本数 |
-|---|---|---|---|---|---|
-| Modelflare | claude-first-topup | 97.62% | ¥1.99 | ¥9.96 | 168 |
-| Apiporter | Claude_core | 100.00% | ¥20.00 | ¥100.00 | 3 |
-| ZNB.ai | znb-cc-特惠 | — | ¥1.50 | ¥7.50 | — |
-| Cloudbridge | Claude-core | 97.92% | ¥31.20 | ¥156.00 | 48 |
-| 88API | Claude Max池 可外接 | — | ¥14.00 | ¥70.00 | — |
-
-**Claude Opus 5**（Claude，数据发布于 2026年11月21日）
+**Claude Haiku 5.5**（Claude，数据发布于 2026年11月24日）
 
 | 中转站 | 分组 | 可用率 | 输入 | 输出 | 样本数 |
 |---|---|---|---|---|---|
-| Modelflare | claude-first-topup | 98.18% | ¥1.00 | ¥4.98 | 165 |
+| Modelflare | claude-award | 97.19% | ¥0.17 | ¥0.83 | 178 |
+| Sidrune AI | Claude-Max-cc | 100.00% | ¥0.10 | ¥0.50 | 48 |
+| 88API | Claude Max池 可外接 | — | ¥0.14 | ¥0.70 | — |
+
+**Claude Opus 5**（Claude，数据发布于 2026年11月24日）
+
+| 中转站 | 分组 | 可用率 | 输入 | 输出 | 样本数 |
+|---|---|---|---|---|---|
+| Modelflare | claude-first-topup | 97.25% | ¥1.00 | ¥4.98 | 109 |
 | IKunCode | cc逆向 | — | ¥3.50 | ¥17.50 | — |
-| 智流 FluxLane | Claude-Kiro｜增强优选 | — | ¥2.00 | ¥10.00 | — |
-| Sidrune AI | Claude-Kiro | — | ¥1.25 | ¥6.25 | — |
 | 破晓 | kiro | — | ¥1.00 | ¥5.00 | — |
+| 智流 FluxLane | Claude-Kiro｜增强优选 | — | ¥2.00 | ¥10.00 | — |
+| ModelPod | default | — | ¥12.56 | ¥62.81 | — |
 
-**GPT 6.1 Sol**（GPT / Codex，数据发布于 2026年11月21日）
-
-| 中转站 | 分组 | 可用率 | 输入 | 输出 | 样本数 |
-|---|---|---|---|---|---|
-| Modelflare | openai-first-topup | 97.27% | ¥0.20 | ¥1.00 | 183 |
-| Sidrune AI | GPT-限时福利 | 95.83% | ¥0.20 | ¥1.00 | 48 |
-| IKunCode | Codex | — | ¥0.50 | ¥2.50 | — |
-| Zashmodel | gpt-prime | 95.83% | — | — | 48 |
-| Apiporter | Codex_core | — | ¥0.54 | ¥2.70 | — |
-
-**GPT-6.2 Sol**（GPT / Codex，数据发布于 2026年11月21日）
+**GPT-6.2 Sol**（GPT / Codex，数据发布于 2026年11月24日）
 
 | 中转站 | 分组 | 可用率 | 输入 | 输出 | 样本数 |
 |---|---|---|---|---|---|
 | Modelflare | openai-first-topup | — | ¥0.20 | ¥1.00 | — |
-| Apiporter | Codex_core | — | ¥20.25 | ¥40.50 | — |
+| 破晓 | 【限时】Codex 双十一 不降智 | 100.00% | ¥0.10 | ¥0.50 | 48 |
+| aicode | 028 OpenAI 不降智 | 100.00% | ¥0.56 | ¥2.80 | 48 |
 | 智流 FluxLane | GPT-PLUS｜优选线路 | — | ¥0.20 | ¥1.00 | — |
-| aicode | 028 OpenAI 不降智 | 100.00% | ¥0.56 | ¥2.80 | 31 |
-| Sidrune AI | GPT-Azure | — | ¥5.00 | ¥25.00 | — |
+| ModelPod | default | — | ¥2.01 | ¥10.05 | — |
 
-**GPT-6.2 Astra**（GPT / Codex，数据发布于 2026年11月21日）
+**GPT-6.1 Terra**（GPT / Codex，数据发布于 2026年11月24日）
+
+| 中转站 | 分组 | 可用率 | 输入 | 输出 | 样本数 |
+|---|---|---|---|---|---|
+| Modelflare | openai-enterprise | — | ¥3.32 | ¥16.60 | — |
+| IKunCode | Codex | — | ¥0.25 | ¥1.25 | — |
+| 破晓 | codex-企业分组 | — | ¥0.20 | ¥1.00 | — |
+| 智流 FluxLane | GPT-MAX｜满血专线 | — | ¥0.19 | ¥0.95 | — |
+| ModelPod | default | — | ¥1.01 | ¥5.03 | — |
+
+**GPT-6.2 Astra**（GPT / Codex，数据发布于 2026年11月24日）
 
 | 中转站 | 分组 | 可用率 | 输入 | 输出 | 样本数 |
 |---|---|---|---|---|---|
 | Modelflare | openai-first-topup | — | ¥0.80 | ¥3.98 | — |
-| Apiporter | Codex_core | — | ¥20.25 | ¥40.50 | — |
+| 破晓 | 【限时】Codex 双十一 不降智 | 100.00% | ¥0.40 | ¥2.00 | 48 |
 | 智流 FluxLane | GPT-PLUS｜优选线路 | — | ¥1.00 | ¥5.00 | — |
-| Sidrune AI | GPT-Azure | — | ¥20.00 | ¥100.00 | — |
-| 破晓 | 【限时】Codex 双十一 不降智 | 100.00% | ¥0.40 | ¥2.00 | 31 |
+| ModelPod | default | — | ¥8.04 | ¥40.20 | — |
+| 序点算力 | 对接0.2倍率 | — | ¥1.60 | ¥8.00 | — |
 
 ## 五、需谨慎的中转站
 
@@ -475,7 +498,7 @@
 
 ## 九、相关链接：中转站公开快照子站
 
-下面 6 个站点都由 Folkbench 公开快照每天生成，角度不同，可按需要查看。排序按站点规则，含合作档位与运营加权；部分数据为展示样本。
+下面 6 个站点都由 Folkbench 公开快照每天生成，角度不同，可按需要查看。排序按站点规则，含合作档位与运营加权。
 
 - [AI API 中转站公开快照（中转站排行）](https://folkbench.github.io/relay-rank/?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend&utm_content=relay-rank)：按模型查看各中转站的公开快照记录与站点档案。
 - [中转站探针公开快照周报](https://folkbench.github.io/integrity-weekly/?utm_source=github&utm_medium=readme&utm_campaign=relay-recommend&utm_content=integrity-weekly)：每周汇总已公开的模型身份探针结果。
@@ -512,6 +535,7 @@ Ordering on Folkbench and in this repo follows Folkbench site rules, including p
 
 ## 更新日志
 
+- **2026-11-24 10:42**：按 Folkbench 中转站列表页刷新分站数据快照（34→36 家，新增 悟空API、NexoToken）；CheapAI 有了近 24h 可用率 100.0%，位次从第 12 升到第 2；aicode 可用率 98.9%→100.0%，从第 8 升到第 4；ZNB.ai 从第 3 降到第 6；Sidrune AI 可用率 99.3%→86.8%，从第 4 落到第 10；CheapRouter 99.0%→95.8%（第 9）；Apiporter 91.7%→54.2%，Cloudbridge 89.6%→52.1%。按模型的 Claude / GPT Codex 测评快照按 2026-11-24 发布数据更新（Claude Fable 5.1 换为 Claude Haiku 5.5，GPT 6.1 Sol 换为 GPT-6.1 Terra）。新增「缓存计费怎么核对」；相关链接与收录 issue 模板的排序说明与顶部披露统一。
 - **2026-11-23 12:45**：更新排序说明措辞。
 - **2026-11-23 12:28**：按 Folkbench 中转站列表页刷新分站数据快照（33→34 家，新增 Modelflare）；CheapRouter 近 24h 可用率 100.0%→99.0%，位次从第 2 到第 7，ZNB.ai 升到第 3；破晓首字延迟 3.65 s→4.39 s，IKunCode 4.64 s→4.95 s，aicode 可用率 98.8%→98.9%；Zashmodel 可用率 98.7%→98.8%；Apiporter 可用率 97.9%→91.7%，Cloudbridge 可用率 95.8%→89.6%。按模型的 Claude / GPT Codex 测评快照同步源数据前 5 条。
 - **2026-11-23 10:55**：按 Folkbench 中转站列表页刷新分站数据快照（32→33 家，新增 WoofAPI）；CheapRouter 出现近 24h 可用率 100.0%，位次从第 17 升到第 2，ZNB.ai 升到第 3；FluxLane 仍为第 1，近 24h 可用率 100.0%→98.6%；Apiporter 降到第 9（可用率 97.9%，延迟 2.62 s→5.67 s），Cloudbridge 降到第 10（可用率 95.8%，延迟 2.77 s→5.84 s）；ModelPod、COFFEE API 暂无近 24h 成功请求记录，分别从第 5、第 9 落到第 17、第 30。多家覆盖模型数、延迟和倍率有更新。新增「换线路后，工具调用和 JSON 怎么查」。FAQ 数据安全等级按数据安全榜 2026-11-23 更新（0 级站点 32→33 家）。
